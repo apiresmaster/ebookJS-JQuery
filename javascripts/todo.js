@@ -37,7 +37,6 @@ $(function() {
 		if(event.which === 13) {
 			addTarefa($("#tarefa").val());
 			$("#tarefa").val("");
-			console.log("------");
 		}
 	}
 
@@ -77,9 +76,32 @@ $(function() {
 		$(".tarefa-item").click(onTarefaItemClick);
 	}
 
+  	function onCepDone(data) {  		
+  		$("p").remove(".dadosCEP");
+  		var $dadosLogradouro = $("<p class='dadosCEP'>").text(data.logradouro).
+  								append($("<p class='dadosCEP'>").text(data.bairro));
+  		$("#resultado").append($dadosLogradouro);
+  	}
+
+  	function onCepError(error) {
+  		var $dadosLogradouro = $("<p class='errorCEP'>").css("background-color", "red").
+  								text("Opsss. Ocorreu um erro: "+error.status);
+  		$("#error").append($dadosLogradouro);
+  	}
+
+  	function consultaCEP() {  		
+  		$("p").remove(".errorCEP");
+	  	var servico = "http://api.postmon.com.br/v1/cep/";
+		$.getJSON(servico + $("#cep").val())
+			.done(onCepDone)
+			.fail(onCepError);
+	}	
+
 	//Registra eventos
   	$(".tarefa-delete").click(onTarefaDeleteClick);
   	$(".tarefa-item").click(onTarefaItemClick);
   	//evento Keydown pois pega o item específico por id
   	$("#tarefa").keydown(onTarefaKeydown);
+  	$("#cep").focusout(consultaCEP);
+
 });
